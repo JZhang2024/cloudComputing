@@ -38,7 +38,7 @@ def main():
     operand_b = int(input("Enter second operand: "))
     operator = input("Enter operation: ")
 
-    #perform operation
+    #calculate result
     result = operation(operand_a, operand_b, operator)
     print(f'Result: {result}')
 
