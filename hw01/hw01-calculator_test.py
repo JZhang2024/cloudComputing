@@ -35,4 +35,6 @@ class TestCalculator():
             calculator.operation(1, 2, "a")
         with pytest.raises(ValueError):
             calculator.operation(1, 2, " ")
+        with pytest.raises(TypeError):
+            calculator.operation("", 2, "+")
         

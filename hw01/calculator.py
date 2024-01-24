@@ -41,3 +41,6 @@ def main():
     #perform operation
     result = operation(operand_a, operand_b, operator)
     print(f'Result: {result}')
+
+if __name__ == "__main__":
+    main()
