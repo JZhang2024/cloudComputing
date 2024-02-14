@@ -8,17 +8,15 @@ s3 = boto3.resource('s3')
 
 def list_buckets():
     '''List all the buckets in the S3 account.'''
-    for bucket in s3.buckets.all():
-        print(bucket.name)
+    return [bucket.name for bucket in s3.buckets.all()]
 
 def select_bucket():
     '''Select a bucket from the list of buckets.'''
     bucket_name = input("Enter the bucket name: ")
     return bucket_name
 
-def backup_files(bucket_name):
+def backup_files(bucket_name, folder_path):
     '''Backup files from a folder to a bucket in S3.'''
-    folder_path = input("Enter the path of the folder you want to backup: ")
     for subdir, _, files in os.walk(folder_path):
         for file in files:
             full_path = os.path.join(subdir, file)
@@ -28,8 +26,7 @@ def backup_files(bucket_name):
 def list_objects(bucket_name):
     '''List all the objects in a bucket.'''
     bucket = s3.Bucket(bucket_name)
-    for obj in bucket.objects.all():
-        print(obj.key)
+    return [obj.key for obj in bucket.objects.all()]
 
 def download_object(bucket_name):
     '''Download an object from a bucket.'''
@@ -47,16 +44,15 @@ def generate_presigned_url(bucket_name, object_name):
                                                     Params={'Bucket': bucket_name,
                                                             'Key': object_name},
                                                     ExpiresIn=3600)
-        print(url)
+        return url
     except NoCredentialsError:
-        print("Credentials not available")
+        return "Credentials not available"
 
 def list_object_version_info(bucket_name, object_name):
     '''List object version info.'''
     try:
         versions = s3.Bucket(bucket_name).object_versions.filter(Prefix=object_name)
-        for version in versions:
-            print(version.get())
+        return versions
     except NoCredentialsError:
         print("Credentials not available")
 
@@ -81,24 +77,32 @@ def main_menu():
         print("8. Exit")
         choice = int(input("Enter your choice: "))
         if choice == 1:
-            list_buckets()
+            buckets = list_buckets()
+            for bucket in buckets:
+                print(bucket)
         elif choice == 2:
             bucket_name = select_bucket()
-            backup_files(bucket_name)
+            folder_path = input("Enter the path of the folder: ")
+            backup_files(bucket_name, folder_path)
         elif choice == 3:
             bucket_name = select_bucket()
-            list_objects(bucket_name)
+            object_keys = list_objects(bucket_name)
+            for key in object_keys:
+                print(key)
         elif choice == 4:
             bucket_name = select_bucket()
             download_object(bucket_name)
         elif choice == 5:
             bucket_name = select_bucket()
             object_name = input("Enter the name of the object: ")
-            generate_presigned_url(bucket_name, object_name)
+            url = generate_presigned_url(bucket_name, object_name)
+            print(url)
         elif choice == 6:
             bucket_name = select_bucket()
             object_name = input("Enter the name of the object: ")
-            list_object_version_info(bucket_name, object_name)
+            versions = list_object_version_info(bucket_name, object_name)
+            for version in versions:
+                print(version.get())
         elif choice == 7:
             bucket_name = select_bucket()
             object_name = input("Enter the name of the object: ")
