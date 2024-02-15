@@ -1,8 +1,10 @@
 '''hw04/main_menu.py'''
 
 import os
+import time
 import boto3
 from botocore.exceptions import NoCredentialsError
+from botocore.exceptions import BotoCoreError, ClientError
 
 s3 = boto3.resource('s3')
 
@@ -24,7 +26,7 @@ def select_bucket():
 
 def backup_files(bucket_name, folder_path):
     '''Backup files from a folder to a bucket in S3.'''
-    s3 = boto3.client('s3')
+    s3_client = boto3.client('s3')
     if not os.path.exists(folder_path):
         print("Folder does not exist.")
         return
@@ -33,14 +35,17 @@ def backup_files(bucket_name, folder_path):
         print("Bucket does not exist.")
         return
     #splits large files into smaller chunks for faster upload
-    transfer_config = boto3.s3.transfer.TransferConfig(multipart_threshold=1024**3, multipart_chunksize=1024**3)
-    
+    transfer_config = boto3.s3.transfer.TransferConfig(multipart_threshold=1024**3,
+                                                       multipart_chunksize=1024**3)
     for subdir, _, files in os.walk(folder_path):
         for file in files:
             full_path = os.path.join(subdir, file)
             with open(full_path, 'rb') as data:
                 try:
-                    s3.upload_fileobj(data, bucket_name, full_path[len(folder_path)+1:], Config=transfer_config)
+                    s3_client.upload_fileobj(data,
+                                      bucket_name,
+                                      full_path[len(folder_path)+1:],
+                                      Config=transfer_config)
                     print(f"File {full_path} backed up successfully.")
                 except NoCredentialsError:
                     print("Credentials not available")
@@ -75,7 +80,7 @@ def list_object_version_info(bucket_name, object_name):
         versions = s3.Bucket(bucket_name).object_versions.filter(Prefix=object_name)
         return versions
     except NoCredentialsError:
-        print("Credentials not available")
+        return "Credentials not available"
 
 def delete_object(bucket_name, object_name):
     '''Delete an object from a bucket.'''
@@ -85,23 +90,52 @@ def delete_object(bucket_name, object_name):
     except NoCredentialsError:
         print("Credentials not available")
 
-def upload(bucket_name, localFolderName):
-    '''Uploads a folder to an S3 bucket. Files are uploaded one at a time and folder structure is preserved.'''
-    s3 = boto3.client('s3')
-    for subdir, _, files in os.walk(localFolderName):
+
+
+def upload(bucket_name, local_folder_name):
+    '''Uploads a folder to an S3 bucket.
+    Files are uploaded one at a time and folder structure is preserved.'''
+    s3_client = boto3.client('s3')
+    #splits large files into smaller chunks for faster upload
+    transfer_config = boto3.s3.transfer.TransferConfig(multipart_threshold=1024**3,
+                                                       multipart_chunksize=1024**3)
+    for subdir, _, files in os.walk(local_folder_name):
         for file in files:
             full_path = os.path.join(subdir, file)
-            with open(full_path, 'rb') as data:
-                s3.upload_fileobj(data, bucket_name, full_path[len(localFolderName):],
-                                  Config=boto3.s3.transfer.TransferConfig(multipart_threshold=1024**3)) #automatically handles large files
+            key = full_path[len(local_folder_name):]
+            s3_obj = s3.Object(bucket_name, key)
+            if s3_obj.key not in list_objects(bucket_name):
+                pass
+            elif s3_obj.last_modified.timestamp() > os.path.getmtime(full_path):
+                continue  # Skip this file because it has not changed
+            for _ in range(3):  # Retry up to 3 times
+                try:
+                    with open(full_path, 'rb') as data:
+                        s3_client.upload_fileobj(data,
+                                          bucket_name,
+                                          key,
+                                          Config=transfer_config)
+                    break  # The upload was successful, so we break out of the retry loop
+                except BotoCoreError as upload_exception:
+                    print(f"Error uploading {full_path} to {bucket_name}: {upload_exception}")
+                    time.sleep(5)  # Wait for 5 seconds before retrying
+                except IOError as upload_exception:
+                    print(f"Error reading file {full_path}: {upload_exception}")
+                    break  # There's no point in retrying if we can't read the file
 
-def list_contents(bucket_name, serverFolderName):
+def list_contents(bucket_name, server_folder_name):
     '''List the contents of a folder in an S3 bucket.'''
-    return [obj.key for obj in s3.Bucket(bucket_name).objects.filter(Prefix=serverFolderName)]
+    return [obj.key for obj in s3.Bucket(bucket_name).objects.filter(Prefix=server_folder_name)]
 
-def get_file(bucket_name, serverFolderName, file_name):
+def get_file(bucket_name, server_folder_name, file_name):
     '''Download a file from a folder in an S3 bucket.'''
-    s3.Bucket(bucket_name).download_file(serverFolderName + '/' + file_name, file_name)
+    try:
+        s3.Object(bucket_name, server_folder_name + '/' + file_name).load()
+        s3.Bucket(bucket_name).download_file(server_folder_name + '/' + file_name, file_name)
+        print("File downloaded successfully")
+    except ClientError as not_found_exception:
+        print("Either the specified folder/file does not exist or another error occurred: ",
+              not_found_exception)
 
 def main_menu():
     '''Main menu for the S3 application.'''
@@ -144,6 +178,9 @@ def main_menu():
             bucket_name = select_bucket()
             object_name = input("Enter the name of the object: ")
             versions = list_object_version_info(bucket_name, object_name)
+            if versions == "Credentials not available":
+                print("Credentials not available")
+                continue
             for version in versions:
                 print(version.get())
         elif choice == 7:
@@ -152,19 +189,19 @@ def main_menu():
             delete_object(bucket_name, object_name)
         elif choice == 8:
             bucket_name = select_bucket()
-            localFolderName = input("Enter the name of the folder: ")
-            upload(bucket_name, localFolderName)
+            local_folder_name = input("Enter the name of the folder: ")
+            upload(bucket_name, local_folder_name)
         elif choice == 9:
             bucket_name = select_bucket()
-            serverFolderName = input("Enter the name of the folder: ")
-            contents = list_contents(bucket_name, serverFolderName)
+            server_folder_name = input("Enter the name of the folder: ")
+            contents = list_contents(bucket_name, server_folder_name)
             for content in contents:
                 print(content)
         elif choice == 10:
             bucket_name = select_bucket()
-            serverFolderName = input("Enter the name of the folder: ")
+            server_folder_name = input("Enter the name of the folder: ")
             file_name = input("Enter the name of the file: ")
-            get_file(bucket_name, serverFolderName, file_name)
+            get_file(bucket_name, server_folder_name, file_name)
         elif choice == 11:
             break
         else:
