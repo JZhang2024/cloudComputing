@@ -27,7 +27,7 @@ jobs:
           pip install pylint
       - name: Analyzing the code with pylint
         run: |
-          pylint $(git ls-files 'hw04/*.py')
+          pylint --fail-under=9.5 $(git ls-files 'hw04/*.py')
       - name: Run all your pytest tests in your code
         run: |
           pytest
