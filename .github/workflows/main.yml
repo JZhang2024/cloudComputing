@@ -31,4 +31,4 @@ jobs:
           pylint $(git ls-files 'hw01/*.py')
       - name: Run all your pytest tests in your code
         run: |
-          pytest
+          pytest hw01
