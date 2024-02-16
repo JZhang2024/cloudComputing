@@ -28,6 +28,12 @@ jobs:
       - name: Analyzing the code with pylint
         run: |
           pylint --fail-under=9.5 $(git ls-files 'hw04/*.py')
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Run all your pytest tests in your code
         run: |
           pytest
