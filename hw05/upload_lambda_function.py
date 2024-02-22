@@ -5,7 +5,7 @@ import boto3
 print('Loading function')
 
 s3 = boto3.client('s3')
-dynamo = boto3.client('dynamodb')
+dynamo = boto3.client('dynamodb', region_name='us-east-1')
 
 
 def lambda_handler(event, context):
@@ -22,8 +22,8 @@ def lambda_handler(event, context):
         
         #retrieve upload date from s3 object
         last_modified = response['LastModified']
-        #retrieve file ARN from s3 object
-        arn = response['ResponseMetadata']['HTTPHeaders']['x-amz-request-id']
+        #retrieve s3 object ARN from s3 object
+        arn = f'arn:aws:s3:::{bucket}/{key}'
         #retrieve entity tag from s3 object
         etag = response['ETag']
         
