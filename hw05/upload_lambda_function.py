@@ -30,10 +30,10 @@ def lambda_handler(event, context):
         #write metadata to dynamodb table with primary key as file_name
         item = {
             'file_name': {'S': key},
-            'size': {'S': size_with_unit},  # Store the size with unit
-            'last_modified': {'S': str(last_modified)},
-            'arn': {'S': arn},
-            'etag': {'S': etag}
+            'file_size': {'S': size_with_unit},  # Store the size with unit
+            'upload_date': {'S': str(last_modified)},
+            'file_ARN': {'S': arn},
+            'eTag': {'S': etag}
         }
         
         dynamo.put_item(TableName='hw05-table', Item=item)
