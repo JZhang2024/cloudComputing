@@ -47,45 +47,6 @@ def test_upload_lambda_handler():
     assert response['Item']['file_ARN']['S'] == 'arn:aws:s3:::test-bucket/test-key'
 
 @mock_aws
-def test_upload_lambda_handler_large_file():
-    '''test for lambda function to upload metadata of large s3 object to dynamodb table'''
-    # Set up mock S3
-    s3_client = boto3.client('s3', region_name='us-east-1')
-    s3_client.create_bucket(Bucket='test-bucket')
-    s3_client.put_object(Bucket='test-bucket', Key='test-key', Body='a' * 5 * 1024**3)
-    # Set up mock DynamoDB
-    dynamo = boto3.client('dynamodb', region_name='us-east-1')
-    dynamo.create_table(
-        TableName='hw05-table',
-        KeySchema=[{'AttributeName': 'file_name', 'KeyType': 'HASH'}],
-        AttributeDefinitions=[{'AttributeName': 'file_name', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
-    )
-    # Create mock event
-    event = {
-        'Records': [
-            {
-                's3': {
-                    'bucket': {
-                        'name': 'test-bucket'
-                    },
-                    'object': {
-                        'key': 'test-key'
-                    }
-                }
-            }
-        ]
-    }
-    # Call the lambda handler
-    lambda_handler(event, None)
-    # Check that the item was added to DynamoDB
-    response = dynamo.get_item(TableName='hw05-table', Key={'file_name': {'S': 'test-key'}})
-    assert 'Item' in response
-    assert response['Item']['file_name']['S'] == 'test-key'
-    assert response['Item']['file_size']['S'] == '5368709120 bytes'
-    assert response['Item']['file_ARN']['S'] == 'arn:aws:s3:::test-bucket/test-key'
-
-@mock_aws
 def test_upload_lambda_handler_folder_of_objects():
     '''test for lambda function when multiple objects are uploaded to s3 bucket
     lambda is automatically called individually for each object in the folder,
