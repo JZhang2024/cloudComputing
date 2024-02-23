@@ -1,5 +1,4 @@
 '''This lambda function is triggered when an object is deleted from the s3 bucket.'''
-import os
 import urllib.parse
 import boto3
 
@@ -7,7 +6,6 @@ print('Loading function')
 
 s3 = boto3.client('s3')
 dynamo = boto3.client('dynamodb', region_name='us-east-1')
-
 
 def delete_lambda_handler(event, context):
     '''When an object is deleted from the s3 bucket, the lambda will create an CSV file containing
