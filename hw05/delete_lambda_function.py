@@ -32,5 +32,5 @@ def delete_lambda_handler(event, context):
 
     except Exception as delete_exception:
         print(delete_exception)
-        print('Error getting object {} from bucket {}.'.format(key, bucket))
+        print(f'Error getting object {key} from bucket {bucket}')
         raise delete_exception

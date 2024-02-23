@@ -37,5 +37,5 @@ def lambda_handler(event, context):
         #return response['ContentType']
     except Exception as bucket_exception:
         print(bucket_exception)
-        print('Error getting object {} from bucket {}.'.format(key, bucket))
+        print(f'Error getting object {key} from bucket {bucket}')
         raise bucket_exception
