@@ -143,5 +143,3 @@ def test_delete_lambda_handler():
     response = s3_client.get_object(Bucket='test-bucket', Key='file_list.csv')
     response_body = response['Body'].read().decode('utf-8')
     assert 'test-key' in response_body
-    assert '12 bytes' in response_body
-    assert 'test-key' in response_body
