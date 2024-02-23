@@ -21,14 +21,9 @@ def delete_lambda_handler(event, context):
         #retrieve the list of files in the s3 bucket
         file_list = response['Contents']
         #create a csv file with the list of files in the s3 bucket
-        csv_f = 'file_list.csv'
-        with open(csv_f, 'w') as file_csv:
-            for file in file_list:
-                file_csv.write(file['Key'] + '\n')
-        #upload the csv file to the s3 bucket
-        s3.upload_file(csv_f, bucket, csv_f)
-        #delete local copy of csv
-        os.remove(csv_f)
+        csv_data = '\n'.join(file['Key'] for file in file_list)
+        #upload the csv data to the s3 bucket
+        s3.put_object(Body=csv_data, Bucket=bucket, Key='file_list.csv')
 
     except Exception as delete_exception:
         print(delete_exception)
