@@ -2,6 +2,7 @@
 import boto3
 from moto import mock_aws
 from upload_lambda_function import lambda_handler
+from delete_lambda_function import delete_lambda_handler
 
 @mock_aws
 def test_upload_lambda_handler():
@@ -108,3 +109,39 @@ def test_upload_lambda_handler_folder_of_objects():
                                Key={'file_name': {'S': 'test-folder/test-key2'}})
     # Second object should not be in DynamoDB because real events would be processed individually
     assert 'Item' not in response
+
+@mock_aws
+def test_delete_lambda_handler():
+    '''test for delete_lambda_handler
+    that creates a csv file with the list of files in the s3 bucket'''
+    # Set up mock S3
+    s3_client = boto3.client('s3', region_name='us-east-1')
+    s3_client.create_bucket(Bucket='test-bucket')
+    s3_client.put_object(Bucket='test-bucket', Key='test-key', Body='test-content')
+
+    # Create mock event
+    event = {
+        'Records': [
+            {
+                's3': {
+                    'bucket': {
+                        'name': 'test-bucket'
+                    },
+                    'object': {
+                        'key': 'test-key'
+                    }
+                }
+            }
+        ]
+    }
+
+    # Call the lambda handler
+    delete_lambda_handler(event, None)
+
+    # Check that the csv file was added to S3 and contains the expected content
+    #last modified and eTag are not tested because they are not preset in the mock s3 object
+    response = s3_client.get_object(Bucket='test-bucket', Key='file_list.csv')
+    response_body = response['Body'].read().decode('utf-8')
+    assert 'test-key' in response_body
+    assert '12 bytes' in response_body
+    assert 'test-key' in response_body
