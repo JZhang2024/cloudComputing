@@ -13,13 +13,15 @@ def list_buckets_lambda_handler(event, context):
     objectname = body['objectname']
     objectcontent = body['objectcontent']
 
+    print(f'Adding object {objectname} to bucket {bucketname}')
+
     # Create a new s3 client
     s3_client = boto3.client('s3')
 
     # Add the object to the bucket
     s3_client.put_object(Bucket=bucketname, Key=objectname, Body=objectcontent)
 
-    print(f'Added object {objectname} to bucket {bucketname}')
+    print(f'Successfully added object {objectname} to bucket {bucketname}')
 
     # Return the response
     response = {
