@@ -1,0 +1,25 @@
+name: Deploying multiple Lambdas
+on:
+  push:
+    branches:
+      - main
+      - hw06-main
+jobs:
+  lambdas:
+    strategy:
+      matrix:
+        lambda: [hw06-add-object, hw06-delete-object, hw06-list-buckets, hw06-list-objects]
+        python-version: ["3.9"]
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - run: zip -j ${{matrix.lambda}}.zip ./hw06/${{matrix.lambda}}.py
+      - run: aws lambda update-function-code --function-name=${{matrix.lambda}} --zip-file=fileb://${{matrix.lambda}}.zip

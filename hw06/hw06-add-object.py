@@ -3,7 +3,7 @@
 import json
 import boto3
 
-def list_buckets_lambda_handler(event, context):
+def add_object_lambda_handler(event, context):
     '''Add object to the given bucketname. The object file name
     and the file contents are passed in the "body" of the post request'''
 
@@ -31,5 +31,6 @@ def list_buckets_lambda_handler(event, context):
     }
     return {
         'statusCode': 200,
+        'headers': { 'Content-Type': 'application/json' },
         'body': json.dumps(response)
     }

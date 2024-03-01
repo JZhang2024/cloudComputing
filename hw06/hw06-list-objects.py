@@ -15,5 +15,6 @@ def list_objects_lambda_handler(event, context):
         print('No objects found')
     return {
         'statusCode': 200,
+        'headers': { 'Content-Type': 'application/json' },
         'body': json.dumps(response)
     }
