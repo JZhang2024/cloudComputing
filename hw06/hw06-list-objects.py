@@ -8,8 +8,7 @@ def list_objects_lambda_handler(event, context):
     s3_client = boto3.client('s3')
 
     # Get the bucketname from the request
-    body = json.loads(event['body'])
-    bucketname = body['bucketname']
+    bucketname = event['bucketname']
 
     print(f'Listing objects in bucket: {bucketname}')
     response = s3_client.list_objects(Bucket=bucketname)
