@@ -8,7 +8,7 @@ jobs:
   lambdas:
     strategy:
       matrix:
-        lambda: [list_buckets_handler, list_objects_handler, post_object_handler, delete_object_handler]
+        lambda: [hw06-add-object, hw06-delete-object, hw06-list-buckets, hw06-list-objects]
         python-version: ["3.9"]
     runs-on: self-hosted
     steps:
