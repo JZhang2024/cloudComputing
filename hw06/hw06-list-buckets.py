@@ -8,7 +8,9 @@ def list_buckets_lambda_handler(event, context):
     s3_client = boto3.client('s3')
     response = s3_client.list_buckets()
     #output for cloudwatch log
-    print(f'Listing all buckets in the AWS account {event["account_id"]}')
+    sts = boto3.client('sts')
+    account_id = sts.get_caller_identity()['Account']
+    print(f'Listing all buckets in the AWS account {account_id}')
     if response.get('Buckets') is not None:
         for bucket in response['Buckets']:
             print(f'{bucket["Name"]}')
@@ -16,5 +18,6 @@ def list_buckets_lambda_handler(event, context):
         print('No buckets found')
     return {
         'statusCode': 200,
+        'headers': { 'Content-Type': 'application/json' },
         'body': json.dumps(response)
     }
