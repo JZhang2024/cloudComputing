@@ -9,8 +9,7 @@ def list_buckets_lambda_handler(event, context):
     s3_client = boto3.client('s3')
     buckets = s3_client.list_buckets()
     #output for cloudwatch log
-    sts = boto3.client('sts')
-    account_id = sts.get_caller_identity()['Account']
+    account_id = event['context']['account-id']
     print(f'Listing all buckets in the AWS account {account_id}')
     bucket_names = []
     if buckets.get('Buckets') is not None:
