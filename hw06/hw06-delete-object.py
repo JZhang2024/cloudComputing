@@ -8,7 +8,7 @@ def delete_object_lambda_handler(event, context):
     is passed in the "body" of the post request'''
 
     # Get the bucketname and the object name from the request
-    bucketname = event['params']['path']['bucket-name']
+    bucketname = json.loads(event['body-json'])['bucketname']
     objectname = json.loads(event['body-json'])['objectname']
 
     print(f'Deleting object {objectname} from bucket {bucketname}')
@@ -29,6 +29,19 @@ def delete_object_lambda_handler(event, context):
 
     # Delete the object from the bucket
     s3_client.delete_object(Bucket=bucketname, Key=objectname)
+
+    #confirm deletion
+    try:
+        s3_client.head_object(Bucket=bucketname, Key=objectname)
+    except:
+        print(f'Successfully deleted object {objectname} from bucket {bucketname}')
+    else:
+        print(f'Failed to delete object {objectname} from bucket {bucketname}')
+        return {
+            'statusCode': 500,
+            'headers': { 'Content-Type': 'application/json' },
+            'body': json.dumps({'error': f'Failed to delete object {objectname} from bucket {bucketname}'})
+        }
 
     print(f'Successfully deleted object {objectname} from bucket {bucketname}')
 
