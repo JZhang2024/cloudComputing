@@ -2,7 +2,7 @@ import pytest
 import os
 from http_utils import get, post, delete, read_file_into_base64_string, create_data_for_del_object, create_post_data_for_post_object, create_post_data_for_list_objects
 
-base_url = 'https://pdj3jncpqb.execute-api.us-east-1.amazonaws.com/dev'
+base_url = 'https://pdj3jncpqb.execute-api.us-east-1.amazonaws.com/prod'
 test_bucket = 'hw06-jzhang'
 object_name = 'test-object'
 
