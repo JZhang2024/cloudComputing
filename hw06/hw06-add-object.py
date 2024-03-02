@@ -39,7 +39,6 @@ def add_object_lambda_handler(event, context):
     response = {
         'bucketname': bucketname,
         'objectname': objectname,
-        'objectcontent': objectcontent
     }
     return {
         'statusCode': 200,
