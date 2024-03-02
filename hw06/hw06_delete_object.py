@@ -16,6 +16,17 @@ def delete_object_lambda_handler(event, context):
     # Create a new s3 client
     s3_client = boto3.client('s3')
 
+    #if object or bucket does not exist, return 404
+    try:
+        s3_client.head_object(Bucket=bucketname, Key=objectname)
+    except:
+        print(f'Object {objectname} not found in bucket {bucketname}')
+        return {
+            'statusCode': 404,
+            'headers': { 'Content-Type': 'application/json' },
+            'body': json.dumps({'error': f'Object {objectname} not found in bucket {bucketname}'})
+        }
+
     # Delete the object from the bucket
     s3_client.delete_object(Bucket=bucketname, Key=objectname)
 

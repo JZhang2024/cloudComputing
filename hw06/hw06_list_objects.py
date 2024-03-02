@@ -10,6 +10,17 @@ def list_objects_lambda_handler(event, context):
     # Get the bucket-name from the request
     bucketname = event['params']['path']['bucket-name']
 
+    #if bucket does not exist, return 404
+    try:
+        s3_client.head_bucket(Bucket=bucketname)
+    except:
+        print(f'Bucket {bucketname} not found')
+        return {
+            'statusCode': 404,
+            'headers': { 'Content-Type': 'application/json' },
+            'body': json.dumps({'error': f'Bucket {bucketname} not found'})
+        }
+
     print(f'Listing objects in bucket: {bucketname}')
     response = s3_client.list_objects(Bucket=bucketname)
     object_names = []
