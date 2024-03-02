@@ -1,6 +1,6 @@
 import pytest
 import os
-from http_utils import get, post, delete, read_file_into_base64_string
+from http_utils import get, post, delete, read_file_into_base64_string, create_data_for_del_object, create_post_data_for_post_object
 
 base_url = 'https://pdj3jncpqb.execute-api.us-east-1.amazonaws.com/dev'
 test_bucket = 'hw06-jzhang'
@@ -12,9 +12,7 @@ def test_list_buckets_method():
     response = get(f'{base_url}/list')
     print(response)
     assert response['statusCode'] == 200
-    assert 'buckets' in response.json()
-    bucket_names = response.json()['buckets']
-    assert isinstance(bucket_names, list)
+    assert 'buckets' in response['body']
 
 def test_post_method():
     '''Test the post method of the API. It should return the bucket name, object name, and object content.'''
@@ -33,14 +31,19 @@ def test_post_method():
         file.write('Hello World')
 
     data = read_file_into_base64_string('test-object.txt')
-    response = post(f'{base_url}/{test_bucket}/{object_name}', data)
-    assert response.status_code == 200
-    assert 'bucketname' in response.json()
-    assert response.json()['bucketname'] == test_bucket
-    assert 'objectname' in response.json()
-    assert response.json()['objectname'] == object_name
-    assert 'objectcontent' in response.json()
-    assert response.json()['objectcontent'] == data
+    post_data = create_post_data_for_post_object(test_bucket, object_name, data)
+    response = post(f'{base_url}/{test_bucket}', post_data)
+    print(response)
+    assert response['statusCode'] == 200
+    assert 'bucketname' in response['body']
+    assert response['bucketname'] == test_bucket
+    assert 'objectname' in response['body']
+    assert response['body']['objectname'] == object_name
+    assert 'objectcontent' in response
+    assert response['body']['objectcontent'] == data
+
+    os.remove('test-object.txt')
+
 
 #def test_delete_method():
     
