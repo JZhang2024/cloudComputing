@@ -8,6 +8,7 @@ def delete_object_lambda_handler(event, context):
     is passed in the "body" of the post request'''
 
     # Get the bucketname and the object name from the request
+    print(event) #log the event
     bucketname = json.loads(event['body-json'])['bucketname']
     objectname = json.loads(event['body-json'])['objectname']
 
