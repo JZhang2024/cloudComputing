@@ -7,8 +7,8 @@ def list_objects_lambda_handler(event, context):
     '''lambda function for listing all the objects in a bucket'''
     s3_client = boto3.client('s3')
 
-    # Get the bucketname from the request
-    bucketname = event['params']['path']['bucketname']
+    # Get the bucket-name from the request
+    bucketname = event['params']['path']['bucket-name']
 
     print(f'Listing objects in bucket: {bucketname}')
     response = s3_client.list_objects(Bucket=bucketname)
