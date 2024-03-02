@@ -9,8 +9,8 @@ def delete_object_lambda_handler(event, context):
 
     # Get the bucketname and the object name from the request
     print(event) #log the event
-    bucketname = json.loads(event['body-json'])['bucketname']
-    objectname = json.loads(event['body-json'])['objectname']
+    bucketname = event['body-json']['bucket-name']
+    objectname = event['body-json']['file_name']
 
     print(f'Deleting object {objectname} from bucket {bucketname}')
 

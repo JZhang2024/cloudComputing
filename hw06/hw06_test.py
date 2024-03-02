@@ -65,7 +65,7 @@ def test_delete_method():
 
     data = create_data_for_del_object(test_bucket, object_name)
     post(f'{base_url}/{test_bucket}', data)
-    response = delete(f'{base_url}/{test_bucket}', data)
+    response = delete(f'{base_url}/{test_bucket}/{object_name}', data)
     print(response)
     assert response['statusCode'] == 200
     assert 'bucketname' in response['body']
