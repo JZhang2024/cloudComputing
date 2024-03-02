@@ -63,13 +63,31 @@ def test_add_object_method():
 def test_delete_method():
     '''Test the delete method of the API. It should return the bucket name and object name.'''
 
-    data = create_data_for_del_object(test_bucket, object_name)
-    post(f'{base_url}/{test_bucket}', data)
-    response = delete(f'{base_url}/{test_bucket}/{object_name}', data)
+    # Check if test-object-delete.txt exists locally and delete it if it does
+    try:
+        with open('test-object-delete.txt', 'r') as file:
+            pass
+    except FileNotFoundError:
+        pass
+    else:
+        os.remove('test-object-delete.txt')
+
+    # Create test object
+    with open('test-object-delete.txt', 'w') as file:
+        file.write('Hello World')
+
+    data = read_file_into_base64_string('test-object-delete.txt')
+    post_data = create_post_data_for_post_object(test_bucket, 'test-object-delete', data)
+    post_response = post(f'{base_url}/{test_bucket}', post_data)
+    print(post_response)
+    delete_data = create_data_for_del_object(test_bucket, 'test-object-delete')
+    response = delete(f'{base_url}/{test_bucket}/test-object-delete', delete_data)
     print(response)
     assert response['statusCode'] == 200
     assert 'bucketname' in response['body']
     assert test_bucket in response['body']
     assert 'objectname' in response['body']
     assert object_name in response['body']
+    os.remove('test-object-delete.txt')
+
     
