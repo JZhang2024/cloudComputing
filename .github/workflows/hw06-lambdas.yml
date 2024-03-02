@@ -8,7 +8,7 @@ jobs:
   lambdas:
     strategy:
       matrix:
-        lambda: [hw06-add-object, hw06-delete-object, hw06-list-buckets, hw06-list-objects]
+        lambda: [hw06_add_object, hw06_delete_object, hw06_list_buckets, hw06_list_objects]
         python-version: ["3.9"]
     runs-on: self-hosted
     steps:
