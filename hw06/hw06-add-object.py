@@ -9,6 +9,7 @@ def add_object_lambda_handler(event, context):
     and the file contents are passed in the "body" of the post request'''
 
     # Get the bucketname and the object name from the request
+    print(event)
     bucketname = event['params']['path']['bucket-name']
     objectname = event['body-json']['objectname']
     objectcontent = base64.b64decode(event['body-json']['body'])
