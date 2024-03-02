@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - hw06-main
+      - hw06-tests
 
 jobs:
   build:
