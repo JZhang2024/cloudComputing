@@ -9,9 +9,10 @@ def add_object_lambda_handler(event, context):
     and the file contents are passed in the "body" of the post request'''
 
     # Get the bucketname and the object name from the request
+    print(event) #log the event
     bucketname = event['params']['path']['bucket-name']
-    objectname = json.loads(event['body-json'])['objectname']
-    objectcontent = json.loads(base64.b64decode(event['body-json']['body']))
+    objectname = event['body-json']['file_name']
+    objectcontent = base64.b64decode(event['body-json']['body'])
 
     print(f'Adding object {objectname} to bucket {bucketname}')
 
@@ -38,7 +39,6 @@ def add_object_lambda_handler(event, context):
     response = {
         'bucketname': bucketname,
         'objectname': objectname,
-        'objectcontent': objectcontent
     }
     return {
         'statusCode': 200,
