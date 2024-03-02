@@ -2,6 +2,7 @@
 
 import json
 import boto3
+import base64
 
 def add_object_lambda_handler(event, context):
     '''Add object to the given bucketname. The object file name
@@ -10,7 +11,7 @@ def add_object_lambda_handler(event, context):
     # Get the bucketname and the object name from the request
     bucketname = event['params']['path']['bucket-name']
     objectname = json.loads(event['body-json'])['objectname']
-    objectcontent = json.loads(event['body-json'])['objectcontent']
+    objectcontent = json.loads(base64.b64decode(event['body-json']['body']))
 
     print(f'Adding object {objectname} to bucket {bucketname}')
 
