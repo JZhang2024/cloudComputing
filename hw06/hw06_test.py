@@ -90,4 +90,12 @@ def test_delete_method():
     assert object_name in response['body']
     os.remove('test-object-delete.txt')
 
+def test_delete_method_object_not_found():
+    '''Test the delete method of the API. It should return a 404 error if the object does not exist.'''
+
+    response = delete(f'{base_url}/{test_bucket}/not-an-object', create_data_for_del_object(test_bucket, 'not-an-object'))
+    assert response['statusCode'] == 404
+    assert 'error' in response['body']
+    assert 'not-an-object' in response['body']
+
     
