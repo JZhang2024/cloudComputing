@@ -1,0 +1,45 @@
+<html> 
+<head> 
+	<title>Image File Viewer</title> 
+
+    <script>
+        function swapImage(name) {
+            document.getElementById("pic").src="/static/images/"+name;
+        }
+    </script>
+</head> 
+<body> 
+
+    <h1>Upload a new file?</h1>
+
+    <form action = "/upload" method = "post" enctype="multipart/form-data"> 
+		<input type="file" name="file" /> 
+		<input type = "submit" value="Upload"> 
+	</form> 
+
+    <h1>List of Files on the server:</h1>
+
+    <table>
+        {% for file in imagefiles %}
+        <tr>
+            <td>
+                <button onclick="swapImage('{{file[0]}}')">{{file[0]}}</button>
+                <!-- {{file[0]}} -->
+            </td>
+            <!-- <td>
+                <img src="/static/images/{{file[0]}}">
+            </td> -->
+            <td>
+                {{file[1]}}
+            </td>
+            <td>
+                {{file[2]}}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <img id="pic" src="">
+
+
+</body> 
+</html>
