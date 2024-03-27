@@ -3,7 +3,6 @@ from flask import request, render_template
 import util
 import boto3
 
-UPLOAD_FOLDER = "static/images/"
 s3 = boto3.client('s3')
 BUCKET_NAME = "hw07-jzhang"
 
