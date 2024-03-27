@@ -1,8 +1,11 @@
 '''API Routes'''
 from flask import request, render_template
 import util
+import boto3
 
 UPLOAD_FOLDER = "static/images/"
+s3 = boto3.client('s3')
+BUCKET_NAME = "hw07-jzhang"
 
 def configure_routes(app):
     '''Setup all the API routes'''
@@ -10,7 +13,7 @@ def configure_routes(app):
     @app.route('/')
     def list_files():
         '''Show the main screen'''
-        image_list = util.get_file_list(UPLOAD_FOLDER, ".png")
+        image_list = util.get_s3_file_list(BUCKET_NAME, s3, ".png")
         print("Images", image_list)
         return render_template("index.html", imagefiles=image_list)
 
@@ -19,6 +22,6 @@ def configure_routes(app):
         '''Process the file upload and navigate back to the main screen'''
         if request.method == 'POST':
             f = request.files['file']
-            f.save(UPLOAD_FOLDER + f.filename)
+            s3.upload_fileobj(f, BUCKET_NAME, f.filename)
             return list_files()
         return "Operation not supported"
