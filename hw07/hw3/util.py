@@ -4,6 +4,10 @@ def get_s3_file_list(bucket_name, s3_client, file_extension):
     '''Get the list of files in the S3 bucket'''
     files = []
     result = s3_client.list_objects(Bucket=bucket_name)
+
+    if 'Contents' not in result:
+        return files
+
     for obj in result['Contents']:
         if obj['Key'].endswith(file_extension):
             file_info = {
