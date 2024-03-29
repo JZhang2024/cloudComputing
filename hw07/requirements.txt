@@ -1,2 +1,2 @@
-boto3 @ file:///opt/conda/conda-bld/boto3_1649078879353/work
-Flask @ file:///home/ktietz/src/ci/flask_1611932660458/work
+boto3 == 1.21.32
+Flask == 1.1.2
