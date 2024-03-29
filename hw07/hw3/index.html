@@ -1,10 +1,10 @@
 <html> 
 <head> 
-	<title>Image File Viewer</title> 
+	<title>Image File Viewer for S3 bucket: hw07-jzhang</title> 
 
     <script>
-        function swapImage(name) {
-            document.getElementById("pic").src="/static/images/"+name;
+        function swapImage(url) {
+            document.getElementById("pic").src = url;
         }
     </script>
 </head> 
@@ -20,21 +20,18 @@
     <h1>List of Files on the server:</h1>
 
     <table>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Last Modified</th>
+        </tr>
         {% for file in imagefiles %}
         <tr>
             <td>
-                <button onclick="swapImage('{{file[0]}}')">{{file[0]}}</button>
-                <!-- {{file[0]}} -->
+                <button onclick="swapImage('{{file.url}}')">{{file.name}}</button>
             </td>
-            <!-- <td>
-                <img src="/static/images/{{file[0]}}">
-            </td> -->
-            <td>
-                {{file[1]}}
-            </td>
-            <td>
-                {{file[2]}}
-            </td>
+            <td>{{ file.size }}</td>
+            <td>{{ file.last_modified }}</td>
         </tr>
         {% endfor %}
     </table>
