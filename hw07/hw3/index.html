@@ -7,6 +7,26 @@
             document.getElementById("pic").src = url;
         }
     </script>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head> 
 <body> 
 
@@ -30,7 +50,7 @@
             <td>
                 <button onclick="swapImage('{{file.url}}')">{{file.name}}</button>
             </td>
-            <td>{{ file.size }}</td>
+            <td>{{ file.size }} bytes</td>
             <td>{{ file.last_modified }}</td>
         </tr>
         {% endfor %}
