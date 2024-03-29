@@ -12,7 +12,9 @@ def configure_routes(app):
     @app.route('/')
     def list_files():
         '''Show the main screen'''
-        image_list = util.get_s3_file_list(BUCKET_NAME, s3, ".png")
+        image_list_png = util.get_s3_file_list(BUCKET_NAME, s3, ".png")
+        image_list_jpg = util.get_s3_file_list(BUCKET_NAME, s3, ".jpg")
+        image_list = image_list_png + image_list_jpg
         print("Images", image_list)
         return render_template("index.html", imagefiles=image_list)
 
