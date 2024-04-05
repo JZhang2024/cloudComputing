@@ -3,7 +3,6 @@ name: Python package
 on:
   push:
     branches:
-      - main
       - hw05-main
 
 jobs:
