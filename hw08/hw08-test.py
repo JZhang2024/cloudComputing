@@ -31,17 +31,30 @@ def make_request(url, expected_x_cache):
     assert x_cache == expected_x_cache, f"Expected x-cache {expected_x_cache}, but got {x_cache}"
     return response
 
+def check_invalidation_status(distribution_id, invalidation_id):
+    client = boto3.client('cloudfront')
+    invalidation = client.get_invalidation(DistributionId=distribution_id, Id=invalidation_id)
+    return invalidation['Invalidation']['Status']
+
 # Invalidate cache at the beginning of the test
 distribution_id = 'E3BS5Y813LSP7U'
 paths = ['/*']  # Invalidate all paths
-invalidate_cache(distribution_id, paths)
+invalidation = invalidate_cache(distribution_id, paths)
+invalidation_id = invalidation['Invalidation']['Id']
+
+# Wait for the invalidation to complete
+while check_invalidation_status(distribution_id, invalidation_id) != 'Completed':
+    print('Waiting for invalidation to complete...')
+    time.sleep(30)  # Wait for 30 seconds before checking again
+
+print('Invalidation completed.')
 
 # Simulate cache hits and misses
 for page in [main_page, dogs_page, cats_page]:
-    make_request(page, 'MISS')  # Cache miss
+    make_request(page, 'Miss from cloudfront')  # Cache miss
     time.sleep(5)  # Wait for less than 15 seconds
-    make_request(page, 'HIT')  # Cache hit
+    make_request(page, 'Hit from cloudfront')  # Cache hit
     time.sleep(20)  # Wait for more than 15 seconds
-    make_request(page, 'REFRESH_HIT')  # Refresh hit
+    make_request(page, 'RefreshHit from cloudfront')  # Refresh hit
     time.sleep(20)  # Wait for more than 15 seconds
-    make_request(page, 'MISS')  # Cache miss
+    make_request(page, 'Miss from cloudfront')  # Cache miss
