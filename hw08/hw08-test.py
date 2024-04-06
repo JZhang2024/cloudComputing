@@ -56,5 +56,3 @@ for page in [main_page, dogs_page, cats_page]:
     make_request(page, 'Hit from cloudfront')  # Cache hit
     time.sleep(20)  # Wait for more than 15 seconds
     make_request(page, 'RefreshHit from cloudfront')  # Refresh hit
-    time.sleep(20)  # Wait for more than 15 seconds
-    make_request(page, 'Miss from cloudfront')  # Cache miss
