@@ -1,0 +1,62 @@
+<html> 
+<head> 
+	<title>Image File Viewer</title> 
+
+    <script>
+        function swapImage(url) {
+            document.getElementById("pic").src = url;
+        }
+    </script>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head> 
+<body> 
+
+    <h1>Upload a new file?</h1>
+
+    <form action = "/upload" method = "post" enctype="multipart/form-data"> 
+		<input type="file" name="file" /> 
+		<input type = "submit" value="Upload"> 
+	</form> 
+
+    <h1>List of image files in hw07-jzhang bucket:</h1>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Last Modified</th>
+        </tr>
+        {% for file in imagefiles %}
+        <tr>
+            <td>
+                <button onclick="swapImage('{{file.url}}')">{{file.name}}</button>
+            </td>
+            <td>{{ file.size }} bytes</td>
+            <td>{{ file.last_modified }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <img id="pic" src="">
+
+
+</body> 
+</html>
